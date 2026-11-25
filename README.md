@@ -5,3 +5,5 @@ tablet stuurt elk nieuw beeld als JPEG over de Cast-verbinding; de pagina wissel
 volledige beeld binnen is, zodat er niets flikkert.
 
 Alleen `index.html`. Geen gegevens, geen volgcode.
+
+De zender (`zender.html`) start de ontvanger vanuit Chrome op een tv.

@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Delen: zender</title>
+<!-- Zender (Chrome) voor de Chromecast-ontvanger Delen: start de ontvanger op een tv. Het beeld zelf
+     komt van de tablet (die stuurt elk schermbeeld over dezelfde Cast-verbinding). -->
+<script src="https://www.gstatic.com/cv/js/sender/v1/cast_sender.js?loadCastFramework=1"></script>
+<style>
+  body { font: 18px/1.5 system-ui, sans-serif; max-width: 40rem; margin: 3rem auto; padding: 0 1rem; color: #222; }
+  google-cast-launcher { display: inline-block; width: 48px; height: 48px; vertical-align: middle; cursor: pointer; }
+</style>
+</head>
+<body>
+<h1>Delen</h1>
+<p>Tik op het Cast-icoon en kies een tv om de Delen-ontvanger daar te starten. Het beeld komt van de
+tablet die met dezelfde tv verbonden is.</p>
+<p><google-cast-launcher></google-cast-launcher> <span id="stand">Zoekt naar tv's …</span></p>
+<script>
+  window['__onGCastApiAvailable'] = function (beschikbaar) {
+    if (!beschikbaar) { document.getElementById('stand').textContent = 'Casten kan alleen in Chrome.'; return; }
+    const ctx = cast.framework.CastContext.getInstance();
+    ctx.setOptions({ receiverApplicationId: '288E36F5', autoJoinPolicy: chrome.cast.AutoJoinPolicy.ORIGIN_SCOPED });
+    ctx.addEventListener(cast.framework.CastContextEventType.SESSION_STATE_CHANGED, (e) => {
+      document.getElementById('stand').textContent =
+        e.sessionState === 'SESSION_STARTED' || e.sessionState === 'SESSION_RESUMED' ? 'Verbonden.' : 'Niet verbonden.';
+    });
+    document.getElementById('stand').textContent = 'Klaar.';
+  };
+</script>
+</body>
+</html>
