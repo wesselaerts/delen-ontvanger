@@ -5,7 +5,8 @@
 <title>Delen</title>
 <!-- Chromecast-ontvanger voor Delen: toont het scherm van een tablet op de tv. De tablet stuurt elk nieuw
      schermbeeld als JPEG in stukken over de Cast-verbinding (kanaal urn:x-cast:nl.wesselaerts.delen). Deze
-     pagina zet het pas neer als het hele beeld binnen en geladen is: geen laadscherm, geen flikkeren. -->
+     pagina zet het pas neer als het hele beeld binnen, geladen en uitgepakt is, bovenop het vorige beeld:
+     geen laadscherm en geen moment zonder beeld. -->
 <script src="https://www.gstatic.com/cast/sdk/libs/caf_receiver/v3/cast_receiver_framework.js"></script>
 <style>
   html, body { margin: 0; width: 100%; height: 100%; overflow: hidden; background: #ffffff; }
@@ -24,13 +25,18 @@
   let getoond = -1;              // nummer van het beeld dat er nu staat
   const stukken = {};            // nummer -> {k, d: []}
 
+  let laag = 1;                  // het nieuwste beeld ligt bovenop
   function toon(n, data) {
     if (n <= getoond) return;    // een ouder beeld dat later binnenkwam
     const img = verborgen;
-    img.onload = () => {
-      if (n <= getoond) return;
+    img.onload = async () => {
+      // Pas wisselen als het beeld ook echt uitgepakt is, en het oude eronder laten staan. Eerst werd
+      // het oude verborgen zodra het nieuwe geladen was; de tv had het nieuwe dan nog niet getekend en
+      // het scherm was heel even wit: bij tekenen (een paar beelden per seconde) knipperde alles.
+      try { if (img.decode) await img.decode(); } catch (e) {}
+      if (n <= getoond || img !== verborgen) return;
+      img.style.zIndex = ++laag;
       img.style.visibility = 'visible';
-      zichtbaar.style.visibility = 'hidden';
       verborgen = zichtbaar; zichtbaar = img; getoond = n;
       document.getElementById('wacht').style.display = 'none';
     };
