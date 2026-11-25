@@ -54,6 +54,13 @@
   opties.disableIdleTimeout = true;      // blijft staan, ook als er een tijd niets verandert
   opties.skipPlayersLoad = true;         // geen videospeler nodig
   opties.customNamespaces = { [NS]: cast.framework.system.MessageType.JSON };
+  // Klaar: de tablet stuurt dan meteen het huidige beeld (een beeld van vóór dit moment ging verloren)
+  ctx.addEventListener(cast.framework.system.EventType.READY, () => {
+    try { ctx.sendCustomMessage(NS, undefined, { type: 'KLAAR' }); } catch (e) {}
+  });
+  ctx.addEventListener(cast.framework.system.EventType.SENDER_CONNECTED, (e) => {
+    try { ctx.sendCustomMessage(NS, e.senderId, { type: 'KLAAR' }); } catch (x) {}
+  });
   ctx.start(opties);
 </script>
 </body>
